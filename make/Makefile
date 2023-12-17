@@ -9,6 +9,7 @@ include $(TOP)/make.mk
 #   -I../drivers/ \
 #   -I../watch_faces/fitness/
 INCLUDES += \
+  -I../src/ \
   -I$(TOP)/movement/ \
   -I$(TOP)/movement/watch_faces/ \
   -I$(TOP)/movement/watch_faces/clock/ \
@@ -122,6 +123,8 @@ SRCS += \
   $(TOP)/movement/watch_faces/clock/minute_repeater_decimal_face.c \
   $(TOP)/movement/watch_faces/complication/tuning_tones_face.c \
   $(TOP)/movement/watch_faces/complication/kitchen_conversions_face.c \
+  ../src/flowtime.c \
+  ../src/flowtime_face.c \
 # New watch faces go above this line.
 
 # Leave this line at the bottom of the file; it has all the targets for making your project.
