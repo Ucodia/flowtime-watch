@@ -1,0 +1,128 @@
+# Leave this line at the top of the file; it has all the watch library sources and includes.
+TOP = ../sensor-watch
+include $(TOP)/make.mk
+
+# If you add any other subdirectories with header files you wish to include, add them after ../
+# Note that you will need to add a backslash at the end of any line you wish to continue, i.e.
+# INCLUDES += \
+#   -I../ \
+#   -I../drivers/ \
+#   -I../watch_faces/fitness/
+INCLUDES += \
+  -I$(TOP)/movement/ \
+  -I$(TOP)/movement/watch_faces/ \
+  -I$(TOP)/movement/watch_faces/clock/ \
+  -I$(TOP)/movement/watch_faces/settings/ \
+  -I$(TOP)/movement/watch_faces/complication/ \
+  -I$(TOP)/movement/watch_faces/sensor/ \
+  -I$(TOP)/movement/watch_faces/demo/ \
+  -I$(TOP)/movement/../littlefs/ \
+  -I$(TOP)/movement/lib/chirpy_tx/ \
+  -I$(TOP)/movement/lib/TOTP/ \
+  -I$(TOP)/movement/lib/base32/ \
+  -I$(TOP)/movement/lib/sunriset/ \
+  -I$(TOP)/movement/lib/vsop87/ \
+  -I$(TOP)/movement/lib/astrolib/ \
+  -I$(TOP)/movement/lib/morsecalc/ \
+
+# If you add any other source files you wish to compile, add them after ../app.c
+# Note that you will need to add a backslash at the end of any line you wish to continue, i.e.
+# SRCS += \
+#   ../movement.c \
+#   ../drivers/lis2dh.c \
+#   ../watch_faces/fitness/step_count_face.c
+SRCS += \
+  $(TOP)/movement/lib/chirpy_tx/chirpy_tx.c \
+  $(TOP)/movement/lib/TOTP/sha1.c \
+  $(TOP)/movement/lib/TOTP/sha256.c \
+  $(TOP)/movement/lib/TOTP/sha512.c \
+  $(TOP)/movement/lib/TOTP/TOTP.c \
+  $(TOP)/movement/lib/base32/base32.c \
+  $(TOP)/movement/lib/sunriset/sunriset.c \
+  $(TOP)/movement/lib/vsop87/vsop87a_milli.c \
+  $(TOP)/movement/lib/astrolib/astrolib.c \
+  $(TOP)/movement/lib/morsecalc/calc.c \
+  $(TOP)/movement/lib/morsecalc/calc_fns.c \
+  $(TOP)/movement/lib/morsecalc/calc_strtof.c \
+  $(TOP)/movement/lib/morsecalc/morsecalc_display.c \
+  $(TOP)/littlefs/lfs.c \
+  $(TOP)/littlefs/lfs_util.c \
+  $(TOP)/movement/movement.c \
+  $(TOP)/movement/filesystem.c \
+  $(TOP)/movement/watch_faces/clock/simple_clock_face.c \
+  $(TOP)/movement/watch_faces/clock/world_clock_face.c \
+  $(TOP)/movement/watch_faces/clock/beats_face.c \
+  $(TOP)/movement/watch_faces/clock/weeknumber_clock_face.c \
+  $(TOP)/movement/watch_faces/settings/preferences_face.c \
+  $(TOP)/movement/watch_faces/settings/set_time_face.c \
+  $(TOP)/movement/watch_faces/settings/set_time_hackwatch_face.c \
+  $(TOP)/movement/watch_faces/sensor/thermistor_readout_face.c \
+  $(TOP)/movement/watch_faces/sensor/thermistor_logging_face.c \
+  $(TOP)/movement/watch_faces/sensor/thermistor_testing_face.c \
+  $(TOP)/movement/watch_faces/demo/character_set_face.c \
+  $(TOP)/movement/watch_faces/demo/voltage_face.c \
+  $(TOP)/movement/watch_faces/demo/lis2dw_logging_face.c \
+  $(TOP)/movement/watch_faces/demo/demo_face.c \
+  $(TOP)/movement/watch_faces/demo/hello_there_face.c \
+  $(TOP)/movement/watch_faces/complication/pulsometer_face.c \
+  $(TOP)/movement/watch_faces/complication/day_one_face.c \
+  $(TOP)/movement/watch_faces/complication/stopwatch_face.c \
+  $(TOP)/movement/watch_faces/complication/totp_face.c \
+  $(TOP)/movement/watch_faces/complication/totp_face_lfs.c \
+  $(TOP)/movement/watch_faces/complication/sunrise_sunset_face.c \
+  $(TOP)/movement/watch_faces/complication/countdown_face.c \
+  $(TOP)/movement/watch_faces/complication/sailing_face.c \
+  $(TOP)/movement/watch_faces/complication/counter_face.c \
+  $(TOP)/movement/watch_faces/complication/blinky_face.c \
+  $(TOP)/movement/watch_faces/complication/moon_phase_face.c \
+  $(TOP)/movement/watch_faces/sensor/accelerometer_data_acquisition_face.c \
+  $(TOP)/movement/watch_faces/clock/mars_time_face.c \
+  $(TOP)/movement/watch_faces/complication/orrery_face.c \
+  $(TOP)/movement/watch_faces/complication/astronomy_face.c \
+  $(TOP)/movement/watch_faces/complication/tomato_face.c \
+  $(TOP)/movement/watch_faces/complication/probability_face.c \
+  $(TOP)/movement/watch_faces/complication/wake_face.c \
+  $(TOP)/movement/watch_faces/demo/frequency_correction_face.c \
+  $(TOP)/movement/watch_faces/complication/alarm_face.c \
+  $(TOP)/movement/watch_faces/complication/ratemeter_face.c \
+  $(TOP)/movement/watch_faces/complication/interval_face.c \
+  $(TOP)/movement/watch_faces/complication/rpn_calculator_alt_face.c \
+  $(TOP)/movement/watch_faces/complication/stock_stopwatch_face.c \
+  $(TOP)/movement/watch_faces/complication/tachymeter_face.c \
+  $(TOP)/movement/watch_faces/settings/nanosec_face.c \
+  $(TOP)/movement/watch_faces/settings/finetune_face.c \
+  $(TOP)/movement/watch_faces/complication/databank_face.c \
+  $(TOP)/movement/watch_faces/complication/tempchart_face.c \
+  $(TOP)/movement/watch_faces/complication/tally_face.c \
+  $(TOP)/movement/watch_faces/complication/tarot_face.c \
+  $(TOP)/movement/watch_faces/complication/morsecalc_face.c \
+  $(TOP)/movement/watch_faces/complication/rpn_calculator_face.c \
+  $(TOP)/movement/watch_faces/complication/activity_face.c \
+  $(TOP)/movement/watch_faces/demo/chirpy_demo_face.c \
+  $(TOP)/movement/watch_faces/complication/ships_bell_face.c \
+  $(TOP)/movement/watch_faces/sensor/lightmeter_face.c \
+  $(TOP)/movement/watch_faces/complication/discgolf_face.c \
+  $(TOP)/movement/watch_faces/complication/habit_face.c \
+  $(TOP)/movement/watch_faces/complication/planetary_time_face.c \
+  $(TOP)/movement/watch_faces/complication/planetary_hours_face.c \
+  $(TOP)/movement/watch_faces/complication/breathing_face.c \
+  $(TOP)/movement/watch_faces/clock/repetition_minute_face.c \
+  $(TOP)/movement/watch_faces/complication/timer_face.c \
+  $(TOP)/movement/watch_faces/complication/invaders_face.c \
+  $(TOP)/movement/watch_faces/clock/world_clock2_face.c \
+  $(TOP)/movement/watch_faces/complication/time_left_face.c \
+  $(TOP)/movement/watch_faces/complication/randonaut_face.c \
+  $(TOP)/movement/watch_faces/complication/toss_up_face.c \
+  $(TOP)/movement/watch_faces/complication/geomancy_face.c \
+  $(TOP)/movement/watch_faces/clock/simple_clock_bin_led_face.c \
+  $(TOP)/movement/watch_faces/complication/flashlight_face.c \
+  $(TOP)/movement/watch_faces/clock/decimal_time_face.c \
+  $(TOP)/movement/watch_faces/clock/wyoscan_face.c \
+  $(TOP)/movement/watch_faces/complication/couch_to_5k_face.c \
+  $(TOP)/movement/watch_faces/clock/minute_repeater_decimal_face.c \
+  $(TOP)/movement/watch_faces/complication/tuning_tones_face.c \
+  $(TOP)/movement/watch_faces/complication/kitchen_conversions_face.c \
+# New watch faces go above this line.
+
+# Leave this line at the bottom of the file; it has all the targets for making your project.
+include $(TOP)/rules.mk

@@ -1,0 +1,3 @@
+[submodule "sensor-watch"]
+	path = sensor-watch
+	url = https://github.com/joeycastillo/Sensor-Watch.git
