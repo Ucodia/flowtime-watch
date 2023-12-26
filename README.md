@@ -6,7 +6,7 @@ This project depends on the `movement` framework from the [Sensor Watch](https:/
 
 ## Dependencies
 
-To build this project, you need to install the `arm-none-eabi` variant of the Arm GNU Toolchain installed on your machine: [Arm GNU Toolchain Downloads](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+To build this project, you need to install the `arm-none-eabi` variant of the Arm GNU Toolchain on your machine: [Arm GNU Toolchain Downloads](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 ## Building
 
@@ -47,3 +47,7 @@ The emulator should be available at http://localhost:8000/watch.html
 ## Flashing
 
 To flash your Sensor Watch with the Flowtime watch firmware, copy the `movement/make/build/watch.uf2` firmware file to your board. Read more in the official [Sensor Watch documentation](https://www.sensorwatch.net/docs/firmware/flashing/).
+
+## Releasing
+
+To create a release of the firmware, simply run the command `bin/release.sh`.
