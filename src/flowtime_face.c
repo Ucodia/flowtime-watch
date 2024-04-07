@@ -5,6 +5,15 @@
 #include "watch_private_display.h"
 #include "flowtime.h"
 
+static void _update_alarm_indicator(bool settings_alarm_enabled, flowtime_state_t *state)
+{
+    state->alarm_enabled = settings_alarm_enabled;
+    if (state->alarm_enabled)
+        watch_set_indicator(WATCH_INDICATOR_SIGNAL);
+    else
+        watch_clear_indicator(WATCH_INDICATOR_SIGNAL);
+}
+
 void flowtime_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void **context_ptr)
 {
     (void)settings;
@@ -14,8 +23,8 @@ void flowtime_face_setup(movement_settings_t *settings, uint8_t watch_face_index
     {
         *context_ptr = malloc(sizeof(flowtime_state_t));
         flowtime_state_t *state = (flowtime_state_t *)*context_ptr;
+        state->signal_enabled = false;
         state->watch_face_index = watch_face_index;
-        state->reality_check = false;
     }
 }
 
@@ -29,10 +38,14 @@ void flowtime_face_activate(movement_settings_t *settings, void *context)
     if (settings->bit.clock_mode_24h)
         watch_set_indicator(WATCH_INDICATOR_24H);
 
-    if (state->reality_check)
+    // handle chime indicator
+    if (state->signal_enabled)
         watch_set_indicator(WATCH_INDICATOR_BELL);
     else
         watch_clear_indicator(WATCH_INDICATOR_BELL);
+
+    // show alarm indicator if there is an active alarm
+    _update_alarm_indicator(settings->bit.alarm_enabled, state);
 
     watch_set_colon();
 
@@ -47,9 +60,9 @@ bool flowtime_face_loop(movement_event_t event, movement_settings_t *settings, v
     uint8_t pos;
 
     watch_date_time date_time;
+    uint32_t previous_date_time;
     Time flow_time;
     bool alarm_button_down;
-    uint32_t previous_date_time;
     switch (event.event_type)
     {
     case EVENT_ACTIVATE:
@@ -60,6 +73,14 @@ bool flowtime_face_loop(movement_event_t event, movement_settings_t *settings, v
         alarm_button_down = watch_get_pin_level(2);
         previous_date_time = state->previous_date_time;
         state->previous_date_time = date_time.reg;
+
+
+        if (!alarm_button_down)
+        {
+            date_time.unit.hour = flow_time.hour;
+            date_time.unit.minute = flow_time.minute;
+            date_time.unit.second = flow_time.second;
+        }
 
         // check the battery voltage once a day...
         if (date_time.unit.day != state->last_battery_check)
@@ -77,19 +98,72 @@ bool flowtime_face_loop(movement_event_t event, movement_settings_t *settings, v
         if (state->battery_low)
             watch_set_indicator(WATCH_INDICATOR_LAP);
 
+        // TODO: The code below is an optimization to update only what is necessary on screen
+        //       This relies on the raw clock register though flowtime does not implement it so we skip this
+
+        // if ((date_time.reg >> 6) == (previous_date_time >> 6) && event.event_type != EVENT_LOW_ENERGY_UPDATE)
+        // {
+        //     // everything before seconds is the same, don't waste cycles setting those segments.
+        //     watch_display_character_lp_seconds('0' + date_time.unit.second / 10, 8);
+        //     watch_display_character_lp_seconds('0' + date_time.unit.second % 10, 9);
+        //     break;
+        // }
+        // else if ((date_time.reg >> 12) == (previous_date_time >> 12) && event.event_type != EVENT_LOW_ENERGY_UPDATE)
+        // {
+        //     // everything before minutes is the same.
+        //     pos = 6;
+        //     sprintf(buf, "%02d%02d", date_time.unit.minute, date_time.unit.second);
+        // }
+        // else
+        // {
+        // other stuff changed; let's do it all.
+        if (!settings->bit.clock_mode_24h)
+        {
+            // if we are in 12 hour mode, do some cleanup.
+            if (date_time.unit.hour < 12)
+            {
+                watch_clear_indicator(WATCH_INDICATOR_PM);
+            }
+            else
+            {
+                watch_set_indicator(WATCH_INDICATOR_PM);
+            }
+            date_time.unit.hour %= 12;
+            if (date_time.unit.hour == 0)
+                date_time.unit.hour = 12;
+        }
         pos = 0;
         if (event.event_type == EVENT_LOW_ENERGY_UPDATE)
         {
             if (!watch_tick_animation_is_running())
                 watch_start_tick_animation(500);
-            sprintf(buf, "%s%2d%2d%02d  ", watch_utility_get_weekday(date_time), date_time.unit.day, alarm_button_down ? date_time.unit.hour : flow_time.hour, alarm_button_down ? date_time.unit.minute : flow_time.minute);
+            sprintf(buf, "%s%2d%2d%02d  ", watch_utility_get_weekday(date_time), date_time.unit.day, date_time.unit.hour, date_time.unit.minute);
         }
         else
         {
-            sprintf(buf, "%s%2d%2d%02d%02d", watch_utility_get_weekday(date_time), date_time.unit.day, alarm_button_down ? date_time.unit.hour : flow_time.hour, alarm_button_down ? date_time.unit.minute : flow_time.minute, date_time.unit.second);
+            sprintf(buf, "%s%2d%2d%02d%02d", watch_utility_get_weekday(date_time), date_time.unit.day, date_time.unit.hour, date_time.unit.minute, date_time.unit.second);
         }
-
+        // }
         watch_display_string(buf, pos);
+        // handle alarm indicator
+        if (state->alarm_enabled != settings->bit.alarm_enabled)
+            _update_alarm_indicator(settings->bit.alarm_enabled, state);
+        break;
+    case EVENT_ALARM_LONG_PRESS:
+        // state->signal_enabled = !state->signal_enabled;
+        // if (state->signal_enabled)
+        //     watch_set_indicator(WATCH_INDICATOR_BELL);
+        // else
+        //     watch_clear_indicator(WATCH_INDICATOR_BELL);
+        break;
+    case EVENT_BACKGROUND_TASK:
+// uncomment this line to snap back to the clock face when the hour signal sounds:
+// movement_move_to_face(state->watch_face_index);
+#ifdef SIGNAL_TUNE_DEFAULT
+        movement_play_signal();
+#else
+        movement_play_tune();
+#endif
         break;
     default:
         return movement_default_loop_handler(event, settings);
@@ -106,5 +180,12 @@ void flowtime_face_resign(movement_settings_t *settings, void *context)
 
 bool flowtime_face_wants_background_task(movement_settings_t *settings, void *context)
 {
-    return false;
+    (void)settings;
+    flowtime_state_t *state = (flowtime_state_t *)context;
+    if (!state->signal_enabled)
+        return false;
+
+    watch_date_time date_time = watch_rtc_get_date_time();
+
+    return date_time.unit.minute == 0;
 }

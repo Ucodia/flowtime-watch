@@ -8,8 +8,9 @@ typedef struct
     uint32_t previous_date_time;
     uint8_t last_battery_check;
     uint8_t watch_face_index;
+    bool signal_enabled;
     bool battery_low;
-    bool reality_check;
+    bool alarm_enabled;
 } flowtime_state_t;
 
 void flowtime_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void **context_ptr);
